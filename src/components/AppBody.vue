@@ -10,21 +10,17 @@
       <tr>
         <th>MEMO</th>
         <th>DATE</th>
+        <th></th>
       </tr>
       </thead>
       <tbody>
-      <tr >
-
-
+      <tr v-for="row in rows" :key="row.id">
+        <td>{{ row.memo }}</td>
+        <td>{{ row.date }}</td>
+        <td><input type="radio" name="header"></td>
       </tr>
       </tbody>
     </table>
-    <div >
-      {{ rows }}
-      <hr>
-      {{ info }}
-      <br>
-    </div>
   </div>
 </template>
 
@@ -39,39 +35,23 @@ export default {
     return {
       memo: '',
       date: '',
-      rows: [],
-      info: {
-        memo: '',
-        date: ''
-      }
+      rows: []
     }
   },
   methods: {
     inputValue: function () {
       this.date = this.date.replace("T", " ");
-      this.info.memo = this.memo;
-      this.info.date = this.date;
 
-      let tmpJson = JSON.parse(JSON.stringify(this.info));
-      this.$data.rows.push(tmpJson);
-      let testJson = JSON.parse(JSON.stringify(this.$data.rows));
+      this.$data.rows.push({
+        id: Math.random(),
+        memo: this.memo,
+        date: this.date
+      });
 
-      testJson.forEach(function (row) {
-        console.log("log");
-        console.log(row.memo);
-      })
-      console.log(testJson);
-      this.info = {};
+      console.log(this.$data.rows);
       this.memo = '';
       this.date = '';
 
-      console.log("----1111");
-      // console.log(handler.get(this.$data.rows, this.$data.rows[0]));
-
-    },
-    jsonConvert: function (obj) {
-      obj = JSON.parse(JSON.stringify(obj))
-      return obj;
     }
   }
 }
