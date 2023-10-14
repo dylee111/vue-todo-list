@@ -15,12 +15,12 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="row in rows" :key="row.id" @dblclick="chgMemo(row)" :id="row.id" v-on:keyup.enter="modifyMemo(row)">
-        <td><input type="radio" name="header" @click="sendMemo(row.id)"></td>
-        <td v-show="false">{{ row.id }}</td>
+      <tr v-for="row in rows" :key="row.todoId" @dblclick="chgMemo(row)" :id="row.todoId" v-on:keyup.enter="modifyMemo(row)">
+        <td><input type="radio" name="header" @click="sendMemo(row.todoId)"></td>
+        <td v-show="false">{{ row.todoId }}</td>
         <td> <input type="text" v-bind:value="row.todo" readonly class="todoInput"></td>
         <td> <span v-show="isDouble == false">{{ row.toDoDttm }}</span> <input v-show="isDouble == true" type="datetime-local" > </td>
-        <td><input type="checkbox" v-model="checkBox" :value="row.id"></td>
+        <td><input type="checkbox" v-model="checkBox" :value="row.todoId"></td>
       </tr>
       </tbody>
     </table>
@@ -61,7 +61,7 @@ export default {
 
             this.rows.forEach(function (value) {
               if("1" == value.mainTodo) {
-                main = value.id;
+                main = value.todoId;
               }
             });
             this.sendMemo(main);
@@ -95,32 +95,37 @@ export default {
     deleteMemo: function () {
       let idList = [];
       this.checkBox.forEach(function (value) {
+        console.log(value);
         idList.push(value);
       })
-
+      console.log(idList);
       /* DELETE MEMO */
       axios.post('/todo/deleteMemo', idList)
           .then((res) => {
-            console.log(res);
             this.getMemoList();
           });
     },
     /* 메인 메모 설정 */
     sendMemo: function (memoId) {
-      axios.put("/todo/mainMemo", memoId, {
-        headers: {"Content-Type": "application/json"}
-      })
-          .then((res) => {
-            let memo = res.data.todo;
-            let date = res.data.toDoDttm;
-        this.$emit("memo", memo, date);
 
-      });
+      if(null != memoId) {
+        axios.put("/todo/mainMemo", memoId, {
+          headers: {"Content-Type": "application/json"}
+        })
+            .then((res) => {
+              let memo = res.data.todo;
+              let date = res.data.toDoDttm;
+          this.$emit("memo", memo, date);
+
+        });
+      } else {
+        this.$emit("memo", "메모 입력 후 메인 메모 설정", new Date());
+      }
     },
     /* 메모 수정 */
     chgMemo: function (row) {
-      console.log("ID ::: "  + row.id);
-      let memoRow = document.getElementById(row.id);
+      console.log("ID ::: "  + row.todoId);
+      let memoRow = document.getElementById(row.todoId);
       memoRow.children[3].children[1].value = row.toDoDttm.split(".")[0];
 
       this.isDouble = true;
@@ -129,7 +134,7 @@ export default {
 
     },
     modifyMemo: function (row) {
-      let memoRow = document.getElementById(row.id);
+      let memoRow = document.getElementById(row.todoId);
 
       let mTodo = memoRow.children[2].children[0].value;
       let mTodoDttm = memoRow.children[3].children[1].value;
@@ -140,7 +145,7 @@ export default {
       this.isDouble = false;
 
       let input = {
-        id: row.id,
+        id: row.todoId,
         todo: mTodo,
         toDoDttm: mTodoDttm
       }
