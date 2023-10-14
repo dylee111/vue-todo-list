@@ -9,9 +9,7 @@
 export default {
   props: ['propsdata'],
   methods: {
-    sendEvent: function () {
-      this.$emit('renew')
-    }
+
   }
   // name: "AppHeader"
 }
